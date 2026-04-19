@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turing Machine Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="light-mode">
+    <div class="background-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="glass panel">
+            <div class="header-content">
+                <h1>Turing Machine Simulator</h1>
+                <p>This simulator demonstrates how a Turing Machine processes input using a tape, head movement, and state transitions, forming the theoretical foundation of modern computers.</p>
+            </div>
+            <div class="header-controls">
+                <button id="theme-toggle" class="btn btn-icon" title="Toggle Dark Mode">🌙</button>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <!-- LEFT PANEL: CONFIGURATION -->
+            <aside class="left-panel glass panel">
+                <h2>Configuration</h2>
+                
+                <div class="preloaded-section">
+                    <h3>Preloaded Examples</h3>
+                    <div class="button-grid">
+                        <button class="btn btn-outline" id="load-bin-inc">Binary Increment</button>
+                        <button class="btn btn-outline" id="load-replace">Replace 0s with 1s</button>
+                        <button class="btn btn-outline" id="load-even-1s">Even 1s Checker</button>
+                        <button class="btn btn-outline" id="load-reverse">Find End (Right)</button>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3>Machine Settings</h3>
+                    <div class="input-group">
+                        <label for="initial-tape">Initial Tape Input:</label>
+                        <input type="text" id="initial-tape" value="1011" placeholder="e.g. 1011">
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="start-state">Start State:</label>
+                            <input type="text" id="start-state" value="q0">
+                        </div>
+                        <div class="input-group">
+                            <label for="accept-state">Accept State:</label>
+                            <input type="text" id="accept-state" value="q_accept">
+                        </div>
+                        <div class="input-group">
+                            <label for="reject-state">Reject State:</label>
+                            <input type="text" id="reject-state" value="q_reject">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="transitions-section">
+                    <h3>Transitions</h3>
+                    <div class="tabs">
+                        <button class="tab-btn active" data-target="visual-editor">Visual Editor</button>
+                        <button class="tab-btn" data-target="bulk-editor">Bulk Text</button>
+                    </div>
+                    
+                    <div id="visual-editor" class="tab-content active">
+                        <div class="transition-headers" style="display:flex;gap:6px;padding:0 8px;font-size:0.8rem;color:var(--text-muted);font-weight:bold;">
+                            <div style="flex:1">State</div>
+                            <div style="flex:1">Read</div>
+                            <div style="margin:0 10px;">→</div>
+                            <div style="flex:1">Next</div>
+                            <div style="flex:1">Write</div>
+                            <div style="flex:1">Move</div>
+                            <div style="width:28px"></div>
+                        </div>
+                        <div class="transition-list" id="transition-list">
+                            <!-- Dynamically added transition rows go here -->
+                        </div>
+                        <button class="btn btn-primary" id="add-transition-btn" style="width:100%;">+ Add Transition</button>
+                    </div>
+
+                    <div id="bulk-editor" class="tab-content">
+                        <p class="helper-text">Format: <code>State, Read -> NextState, Write, Dir(L/R)</code><br>Use <code>_</code> for blank symbol.</p>
+                        <textarea id="bulk-transitions" rows="8"></textarea>
+                        <button class="btn btn-primary" id="apply-bulk-btn" style="width:100%;">Apply Transitions</button>
+                    </div>
+                </div>
+
+                <div class="save-load-section">
+                    <button class="btn btn-secondary" id="save-config-btn">Save Config</button>
+                    <button class="btn btn-secondary" id="load-config-btn">Load Config</button>
+                </div>
+            </aside>
+
+            <!-- RIGHT PANEL: SIMULATOR & LOG -->
+            <main class="right-panel">
+                
+                <!-- TAPE DISPLAY -->
+                <section class="tape-section glass panel" style="margin-bottom: 20px;">
+                    <h2>Tape Visualization</h2>
+                    <div class="tape-window-container" id="tape-container">
+                        <div class="head-indicator">▼</div>
+                        <div class="tape-window" id="tape-window">
+                            <!-- Tape cells rendered here -->
+                        </div>
+                        <div class="head-highlight"></div>
+                    </div>
+                </section>
+
+                <!-- STATUS & CONTROLS -->
+                <section class="controls-section glass panel" style="margin-bottom: 20px;">
+                    <div class="status-display">
+                        <div class="status-box">
+                            <span class="label">Current State</span>
+                            <span class="value state-val" id="display-state">-</span>
+                        </div>
+                        <div class="status-box">
+                            <span class="label">Head Symbol</span>
+                            <span class="value symbol-val" id="display-symbol">-</span>
+                        </div>
+                        <div class="status-box">
+                            <span class="label">Step Count</span>
+                            <span class="value" id="display-step">0</span>
+                        </div>
+                        <div class="status-box">
+                            <span class="label">Status</span>
+                            <span class="value status-badge" id="display-status">Stopped</span>
+                        </div>
+                    </div>
+
+                    <div class="applied-rule">
+                        <span class="label">Applied Rule: </span>
+                        <code id="display-rule">None</code>
+                    </div>
+
+                    <div class="final-tape-container" id="final-tape-container" style="display: none; margin-top: 15px; padding: 12px; background: rgba(100, 100, 100, 0.1); border-left: 4px solid var(--primary-color); border-radius: 4px;">
+                        <span class="label" style="font-weight: 600; color: var(--text-color);">Final Tape: </span>
+                        <code id="display-final-tape" style="color: var(--primary-color); font-size: 1.1em; word-break: break-all;"></code>
+                    </div>
+
+                    <div class="playback-controls">
+                        <button class="btn btn-success" id="btn-start" title="Initialize machine">⚡ Initialize</button>
+                        <button class="btn btn-primary" id="btn-step" title="Execute one step" disabled>⏭ Step</button>
+                        <button class="btn btn-run" id="btn-run" title="Auto run" disabled>🏃 Run</button>
+                        <button class="btn btn-warning" id="btn-pause" title="Pause auto run" disabled>⏸ Pause</button>
+                        <button class="btn btn-danger" id="btn-reset" title="Reset to initial configuration">🔄 Reset</button>
+                    </div>
+
+                    <div class="speed-control">
+                        <label for="speed-slider" style="display:flex;justify-content:space-between;">
+                            <span>Execution Speed</span>
+                            <span id="speed-value">500ms</span>
+                        </label>
+                        <!-- Slider from fast (left) to slow (right), meaning low delay to high delay -->
+                        <input type="range" id="speed-slider" min="50" max="2000" value="500" step="50">
+                    </div>
+                </section>
+
+                <!-- LOG SECTION -->
+                <section class="log-section glass panel">
+                    <div class="log-header">
+                        <h2>Execution Log</h2>
+                        <button class="btn btn-small btn-secondary" id="btn-download-log">📥 Download .txt</button>
+                    </div>
+                    <div class="log-container" id="log-container">
+                        <!-- Log entries go here -->
+                        <div style="color: var(--text-muted); text-align: center; margin-top: 80px;">Logs will appear here...</div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
