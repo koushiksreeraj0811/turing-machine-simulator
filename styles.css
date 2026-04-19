@@ -478,3 +478,80 @@ textarea { width: 100%; resize: vertical; margin-bottom: 8px; font-family: monos
 .log-entry .log-rule { background: var(--bg-color); padding: 2px 6px; border-radius: 4px; }
 .log-entry.success { color: var(--accent-green); font-weight: bold; }
 .log-entry.error { color: var(--accent-red); font-weight: bold; }
+
+/* Comprehensive Responsive Adjustments */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 12px;
+        gap: 16px;
+    }
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    header h1 {
+        font-size: 1.7rem;
+    }
+    .glass.panel {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 600px) {
+    .app-container {
+        padding: 10px;
+        gap: 12px;
+    }
+    header h1 {
+        font-size: 1.5rem;
+    }
+    header p {
+        font-size: 0.85rem;
+    }
+    .glass.panel {
+        padding: 14px;
+    }
+    .status-display { 
+        grid-template-columns: 1fr 1fr; 
+        gap: 8px;
+    }
+    .status-box {
+        padding: 8px;
+    }
+    .status-box .value { 
+        font-size: 1.1rem; 
+    }
+    .playback-controls button {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+    .transition-row {
+        flex-wrap: wrap;
+    }
+    .tape-window-container {
+        height: 100px;
+    }
+    .tape-cell {
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    .head-highlight {
+        height: 68px;
+    }
+}
+
+@media (max-width: 400px) {
+    .button-grid {
+        grid-template-columns: 1fr;
+    }
+    .status-display {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 1400px) {
+    .app-container {
+        max-width: 1500px;
+    }
+}
